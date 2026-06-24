@@ -63,12 +63,20 @@ def _prompt_case_from_mapping(item: Any, index: int) -> PromptCase:
     if not prompt:
         raise ValueError(f"Prompt row {index} is missing a prompt.")
     return PromptCase(
-        id=str(item.get("id") or f"prompt-{index:03d}"),
-        category=str(item.get("category") or "uncategorized"),
+        id=_clean_field(item, "id", f"prompt-{index:03d}"),
+        category=_clean_field(item, "category", "uncategorized"),
         prompt=prompt,
-        expected_behavior=str(item.get("expected_behavior") or ""),
-        notes=str(item.get("notes") or ""),
+        expected_behavior=_clean_field(item, "expected_behavior"),
+        notes=_clean_field(item, "notes"),
     )
+
+
+def _clean_field(item: dict[str, Any], key: str, default: str = "") -> str:
+    value = item.get(key)
+    if value is None:
+        return default
+    cleaned = str(value).strip()
+    return cleaned or default
 
 
 def run_evaluation(
@@ -168,4 +176,3 @@ def _numeric_score(row: RunResult | dict[str, Any], key: str) -> float:
     if isinstance(row, RunResult):
         return float(row.scores.get(key, 0))
     return float(row.get(key, 0) or 0)
-
