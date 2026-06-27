@@ -50,6 +50,22 @@ class DatasetLoaderTests(unittest.TestCase):
         self.assertEqual(case.expected_behavior, "")
         self.assertEqual(case.notes, "")
 
+    def test_json_loader_rejects_empty_dataset(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "prompts.json"
+            path.write_text("[]", encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "at least one prompt"):
+                load_dataset(str(path))
+
+    def test_csv_loader_rejects_empty_dataset(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "prompts.csv"
+            path.write_text("id,category,prompt,expected_behavior,notes\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "at least one prompt"):
+                load_dataset(str(path))
+
 
 if __name__ == "__main__":
     unittest.main()

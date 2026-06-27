@@ -34,10 +34,16 @@ def load_dataset(dataset_path: str) -> list[PromptCase]:
 
     suffix = path.suffix.lower()
     if suffix == ".json":
-        return _load_json_dataset(path)
-    if suffix == ".csv":
-        return _load_csv_dataset(path)
-    raise ValueError("Dataset must be a .json or .csv file.")
+        prompt_cases = _load_json_dataset(path)
+    elif suffix == ".csv":
+        prompt_cases = _load_csv_dataset(path)
+    else:
+        raise ValueError("Dataset must be a .json or .csv file.")
+
+    if not prompt_cases:
+        raise ValueError("Dataset must contain at least one prompt.")
+
+    return prompt_cases
 
 
 def _load_json_dataset(path: Path) -> list[PromptCase]:
